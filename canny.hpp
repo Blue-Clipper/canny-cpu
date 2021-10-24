@@ -1,5 +1,4 @@
 #include<iostream>
-#include<opencv2/imgproc/imgproc.hpp>
-
 using namespace std;
 
+void canny(u_char **img, int rows, int cols);
