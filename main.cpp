@@ -24,13 +24,13 @@ int main() {
     }
 
     // find edge
-    canny(img, img_rows, img_cols);
+    u_char **edge = canny(img, img_rows, img_cols);
 
     // uchar[][] to mat
     cv::Mat edge_image(img_rows, img_cols, CV_8UC1);
     for(int i = 0; i < img_rows; i ++) {
         for(int j = 0; j < img_cols; j ++) {
-            edge_image.at<u_char>(i, j) = img[i][j];
+            edge_image.at<u_char>(i, j) = edge[i][j];
         }
     }
     cv::imwrite(output_path, edge_image);
