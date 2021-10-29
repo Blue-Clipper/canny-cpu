@@ -10,7 +10,7 @@ message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES canny.hpp main.cpp canny.cpp)
+set(SOURCE_FILES  main.cpp canny.hpp canny.cpp io.hpp io.cpp)
 
 add_executable(canny_cpu ${SOURCE_FILES})
 
