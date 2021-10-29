@@ -17,6 +17,7 @@ Canny::Canny(u_char **img, int upper_threshold, int lower_threshold, int rows, i
     gaussian_filter();
     gradient();
     trace_edge();
+    suppress();
 }
 Canny::~Canny() {
     delete_img(_origin_img);
@@ -174,7 +175,92 @@ void Canny::find_edge(int rowShift, int colShift, int i, int j, int dir) {
         }
     }
 }
+void Canny::suppress() {
+    for(int i = 1; i < _rows - 1; i ++) {
+        for(int j = 1; j < _cols; j ++) {
+            if(_edge_img[i][j] == 255) {
+                switch (_gradient_direction[i][j]) {
+                    case 0:
+                        suppress_non_max(1, 0, i, j, 0);
+                        break;
+                    case 45:
+                        suppress_non_max(1, -1, i, j, 45);
+                        break;
+                    case 90:
+                        suppress_non_max(0, 1, i, j, 90);
+                        break;
+                    case 135:
+                        suppress_non_max(1, 1, i, j, 135);
+                }
 
+            }
+        }
+    }
+}
+void Canny::suppress_non_max(int rowShift, int colShift, int i, int j, int dir) {
+    bool edgeEnd = false;
+    float nonMax[_cols][3];
+    int pixelCnt = 0;
+    int cnt;
+    int newRow = i + rowShift;
+    int newCol = j + colShift;
+    if(newRow < 0 || newRow >= _rows) {
+        edgeEnd = true;
+    } 
+    if(newCol < 0 || newCol >= _cols) {
+        edgeEnd = true;
+    }
+    while(_gradient_direction[newRow][newCol] == dir && !edgeEnd && _edge_img[newRow][newCol] == 255) {
+        int newRow = newRow + rowShift;
+        int newCol = newCol + colShift;
+        if(newRow < 0 || newRow >= _rows) {
+            break;
+        } 
+        if(newCol < 0 || newCol >= _cols) {
+            break;
+        }
+        nonMax[pixelCnt][0] = newRow;
+        nonMax[pixelCnt][1] = newCol;
+        nonMax[pixelCnt][2] = _gradient_strength[newRow][newCol];
+        pixelCnt ++;
+    }
+    edgeEnd = false;
+    colShift *= -1;
+    rowShift *= -1;
+    newRow = i + rowShift;
+    newCol = j + colShift;
+    if(newRow < 0 || newRow >= _rows) {
+        edgeEnd = true;
+    } 
+    if(newCol < 0 || newCol >= _cols) {
+        edgeEnd = true;
+    }
+    while(_gradient_direction[newRow][newCol] == dir && !edgeEnd && _edge_img[newRow][newCol] == 255) {
+        int newRow = newRow + rowShift;
+        int newCol = newCol + colShift;
+        if(newRow < 0 || newRow >= _rows) {
+            break;
+        } 
+        if(newCol < 0 || newCol >= _cols) {
+            break;
+        }
+        nonMax[pixelCnt][0] = newRow;
+        nonMax[pixelCnt][1] = newCol;
+        nonMax[pixelCnt][2] = _gradient_strength[newRow][newCol];
+        pixelCnt ++;
+    }
+    int max_pixel[3] = {0, 0, 0};
+    for(int k = 0; k < pixelCnt; k ++) {
+        if(nonMax[k][2] > max_pixel[2]) {
+            max_pixel[0] = nonMax[k][0];
+            max_pixel[1] = nonMax[k][1];
+            max_pixel[2] = nonMax[k][2]; 
+        }
+    }
+    for(int k = 0; k < pixelCnt; k ++) {
+        _edge_img[max_pixel[0]][max_pixel[1]] = 0;
+    }
+}
 void Canny::delete_img(u_char **ptr) {
     if(!ptr) {
         return;

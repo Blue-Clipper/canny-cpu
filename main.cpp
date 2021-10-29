@@ -16,7 +16,7 @@ int main() {
     int cols = grayscale_image.cols;
     cout << rows << " rows, " << cols << " cols"<<endl;
     u_char **input = mat2Array(grayscale_image, rows, cols);
-    Canny c(input, 128, 100, rows, cols);
+    Canny c(input, 128, 40, rows, cols);
     u_char **edge = c.getEdge();
 
     cv::Mat edge_img = array2Mat(edge, rows, cols);

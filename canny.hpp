@@ -27,7 +27,9 @@ class Canny {
         void gaussian_filter();
         void gradient();
         void trace_edge();
-        void find_edge(int rowShift, int colShift, int row, int col, int dir);
+        void find_edge(int rowShift, int colShift, int i, int j, int dir);
+        void suppress();
+        void suppress_non_max(int rowShift, int colShift, int i, int j, int dir);
         void delete_img(u_char **ptr);
 
 };
